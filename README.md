@@ -1,5 +1,5 @@
 # Naos
-Not another operating system, simplest version
+Not another operating system, simplest version (32-bit x86)
 
 ## Description
 This a little modified version of the [bare bones tutorial](https://wiki.osdev.org/Bare_Bones).

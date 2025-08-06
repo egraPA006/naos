@@ -5,26 +5,15 @@ Not another operating system, simplest version (32-bit x86)
 This a little modified version of the [bare bones tutorial](https://wiki.osdev.org/Bare_Bones).
 
 ## Using makefile
-First run:
+Build:
 ```bash
 make build
 ```
-If you miss some dependencies install them and then rerun after with
+For lsp support run:
 ```bash
-make clean && make build
+make lsp
 ```
-If the build was successful, you will see an iso image in root directory of project, and then you can run it with qemu:
+Run iso with qemu:
 ```bash
 make run
-```
-
-## LSP in zeditor
-```json
-"lsp": {
-  "cpp": {
-    "binary": {
-      "path": "/home/egrapa/opt/cross/bin/i686-elf-g++"
-    }
-  }
-}
 ```

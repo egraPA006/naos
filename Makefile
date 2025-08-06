@@ -15,6 +15,13 @@ run: naos.iso | _check-runtime
 	@echo "Running naos..."
 	@qemu-system-i386 -cdrom naos.iso
 
+lsp:
+	@if ! command -v bear >/dev/null 2>&1; then \
+		echo "ERROR: bear not found. Please install it."; \
+		exit 1; \
+	fi
+	bear -- make build
+
 _build-dir:
 	@mkdir -p build
 	@mkdir -p build/isodir/boot/grub

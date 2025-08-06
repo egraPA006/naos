@@ -22,5 +22,6 @@ enum color : uint8_t {
 };
 void write(char c);
 void write(const char *str);
+void write(color col, char c);
 void write(color col, const char *str);
 } // namespace x86::serial

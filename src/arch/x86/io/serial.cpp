@@ -46,6 +46,15 @@ void write(const char *str) {
     }
 }
 
+void write(color col, char c) {
+    // Write color escape sequence
+    write(color_escapes[static_cast<uint8_t>(col)]);
+    // Write the actual char
+    write(c);
+    // Reset color
+    write(color_reset);
+}
+
 void write(color col, const char *str) {
     // Write color escape sequence
     write(color_escapes[static_cast<uint8_t>(col)]);

@@ -1,5 +1,5 @@
 #pragma once
 
-namespace klib {
+namespace klib::utils {
 void neofetch();
 }

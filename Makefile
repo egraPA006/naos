@@ -40,7 +40,7 @@ LDFLAGS := -T $(LINKER_SCRIPT) -ffreestanding -O2 -nostdlib -lgcc
 
 .PHONY: all build run clean lsp help _ensure_build_dir
 
-all: build
+all: lsp run
 
 help:
 	@echo "NAOS Makefile Help"

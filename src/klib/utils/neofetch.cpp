@@ -1,8 +1,8 @@
-#include "neofetch.h"
+#include "klib/utils/neofetch.h"
 #include <arch/x86/serial.h>
 #include <stddef.h>
 
-namespace klib {
+namespace klib::utils {
 
 void neofetch() {
     using x86::serial::color;
@@ -57,4 +57,4 @@ void neofetch() {
     }
 }
 
-} // namespace klib
+} // namespace klib::utils

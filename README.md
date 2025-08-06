@@ -17,3 +17,14 @@ If the build was successful, you will see an iso image in root directory of proj
 ```bash
 make run
 ```
+
+## LSP in zeditor
+```json
+"lsp": {
+  "cpp": {
+    "binary": {
+      "path": "/home/egrapa/opt/cross/bin/i686-elf-g++"
+    }
+  }
+}
+```

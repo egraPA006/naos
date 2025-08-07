@@ -12,21 +12,29 @@ BOOT_DIR := $(ISO_DIR)/boot
 GRUB_DIR := $(BOOT_DIR)/grub
 
 # Source files
-BOOT_SRC := src/arch/x86/boot.s
+BOOT_SRC := src/arch/x86/boot.S
 LINKER_SCRIPT := src/boot/linker.ld
 GRUB_CFG := src/boot/grub.cfg
 
 # Find all kernel and klib sources
 ARCH_SRCS := $(shell find src/arch -name '*.cpp')
+CRTI_SRC := src/arch/x86/crti.S
+CRTN_SRC := src/arch/x86/crtn.S
 KERNEL_SRCS := $(shell find src/kernel -name '*.cpp')
 KLIB_SRCS := $(shell find src/klib -name '*.cpp')
 
 # Object files
 ARCH_OBJS := $(patsubst src/%.cpp,$(BUILD_DIR)/%.o,$(ARCH_SRCS))
 BOOT_OBJ := $(BUILD_DIR)/boot.o
+CRTBEGIN_OBJ := $(shell $(CXX) $(CXXFLAGS) -print-file-name=crtbegin.o)
+CRTEND_OBJ := $(shell $(CXX) $(CXXFLAGS) -print-file-name=crtend.o)
+CRTI_OBJ := $(BUILD_DIR)/arch/x86/crti.o
+CRTN_OBJ := $(BUILD_DIR)/arch/x86/crtn.o
 KERNEL_OBJS := $(patsubst src/%.cpp,$(BUILD_DIR)/%.o,$(KERNEL_SRCS))
 KLIB_OBJS := $(patsubst src/%.cpp,$(BUILD_DIR)/%.o,$(KLIB_SRCS))
 
+# Object files in the correct link order
+ALL_OBJS := $(CRTI_OBJ) $(CRTBEGIN_OBJ) $(ARCH_OBJS) $(BOOT_OBJ) $(KERNEL_OBJS) $(KLIB_OBJS) $(CRTEND_OBJ) $(CRTN_OBJ)
 
 # Output files
 KERNEL_BIN := $(BUILD_DIR)/naos.bin
@@ -36,7 +44,7 @@ ISO_IMAGE := naos.iso
 CFLAGS := -ffreestanding -O2 -Wall -Wextra -I src/include
 CXXFLAGS := $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS :=
-LDFLAGS := -T $(LINKER_SCRIPT) -ffreestanding -O2 -nostdlib -lgcc
+LDFLAGS := -T $(LINKER_SCRIPT) -ffreestanding -O2 -nostdlib -nostartfiles -lgcc
 
 .PHONY: all build run clean lsp help _ensure_build_dir
 
@@ -53,7 +61,7 @@ help:
 	@echo "  lsp       - Generate compilation database (for LSP support)"
 	@echo "  help      - Show this help message"
 
-build: $(ISO_IMAGE) | _check-toolchain
+build: $(ISO_IMAGE) | _check-toolchain _check-crt
 
 run: $(ISO_IMAGE) | _check-runtime
 	@echo "Running naos..."
@@ -78,9 +86,9 @@ $(ISO_IMAGE): $(KERNEL_BIN) $(GRUB_CFG) | $(GRUB_DIR)
 	@cp $(GRUB_CFG) $(GRUB_DIR)/grub.cfg
 	grub-mkrescue -o $@ $(ISO_DIR)
 
-$(KERNEL_BIN): $(ARCH_OBJS) $(BOOT_OBJ) $(KERNEL_OBJS) $(KLIB_OBJS) $(LINKER_SCRIPT)
+$(KERNEL_BIN): $(ALL_OBJS) $(LINKER_SCRIPT)
 	@echo "Linking kernel..."
-	$(LD) $(LDFLAGS) $(ARCH_OBJS) $(BOOT_OBJ) $(KERNEL_OBJS) $(KLIB_OBJS) -o $@
+	$(LD) $(LDFLAGS) $(ALL_OBJS) -o $@
 	@if ! grub-file --is-x86-multiboot $@; then \
 		echo "Error: Kernel is not a valid Multiboot image"; \
 		exit 1; \
@@ -90,6 +98,14 @@ $(KERNEL_BIN): $(ARCH_OBJS) $(BOOT_OBJ) $(KERNEL_OBJS) $(KLIB_OBJS) $(LINKER_SCR
 $(BUILD_DIR)/%.o: src/%.cpp | _ensure_build_dir
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(CRTI_OBJ): $(CRTI_SRC) | _ensure_build_dir
+	@mkdir -p $(@D)
+	$(AS) $(ASFLAGS) $< -o $@
+
+$(CRTN_OBJ): $(CRTN_SRC) | _ensure_build_dir
+	@mkdir -p $(@D)
+	$(AS) $(ASFLAGS) $< -o $@
 
 $(BOOT_OBJ): $(BOOT_SRC) | _ensure_build_dir
 	@mkdir -p $(@D)
@@ -104,6 +120,16 @@ $(BOOT_DIR): | $(ISO_DIR)
 
 $(ISO_DIR): | $(BUILD_DIR)
 	@mkdir -p $@
+
+_check-crt:
+	@if [ ! -f "$(CRTBEGIN_OBJ)" ]; then \
+        echo "ERROR: crtbegin.o not found in toolchain"; \
+        exit 1; \
+    fi
+	@if [ ! -f "$(CRTEND_OBJ)" ]; then \
+        echo "ERROR: crtend.o not found in toolchain"; \
+        exit 1; \
+    fi
 
 # Dependency checks
 _check-toolchain:

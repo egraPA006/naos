@@ -1,5 +1,5 @@
 #include "kernel/terminal/vga.hpp"
-#include <klib/printk.hpp>
+#include "klib/printk.hpp"
 
 namespace kernel::terminal::vga {
 

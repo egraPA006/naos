@@ -1,5 +1,5 @@
 #include "klib/utils/neofetch.hpp"
-#include <arch/x86/serial.hpp>
+#include "arch/x86/serial.hpp"
 #include <stddef.h>
 
 namespace klib::utils {

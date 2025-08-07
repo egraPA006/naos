@@ -1,6 +1,4 @@
 #pragma once
-
-#include <klib/printk.hpp>
 #include <stddef.h>
 #include <stdint.h>
 

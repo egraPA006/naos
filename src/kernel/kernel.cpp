@@ -1,6 +1,5 @@
-#include <kernel/terminal/vga.hpp>
-#include <klib/printk.hpp>
-#include <klib/utils/neofetch.hpp>
+#include "kernel/terminal/vga.hpp"
+#include "klib/utils/neofetch.hpp"
 
 extern "C" void kernel_main(void) {
     klib::utils::neofetch();

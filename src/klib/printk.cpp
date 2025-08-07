@@ -1,5 +1,5 @@
 #include "klib/printk.hpp"
-#include <arch/x86/serial.hpp>
+#include "arch/x86/serial.hpp"
 #include <stdarg.h>
 
 namespace klib {

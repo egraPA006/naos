@@ -1,10 +1,10 @@
 #include "klib/utils/neofetch.hpp"
 #include <arch/x86/serial.hpp>
-#include <cstddef>
 #include <stddef.h>
 
 namespace klib::utils {
 
+// TODO: make it actually parse some args
 void neofetch() {
     using x86::serial::color;
     using x86::serial::write;
@@ -48,7 +48,7 @@ void neofetch() {
             write(color::Cyan, "x86\n");
         } else if (i == 4) {
             write(color::Green, "  OS: ");
-            write(color::White, "NAOS 0.0.1\n");
+            write(color::White, "NAOS 0.0.2\n");
         } else if (i == 5) {
             write(color::Green, " CPU: ");
             write(color::White, "i386\n");

@@ -2,7 +2,7 @@
 CROSS_COMPILE ?= $(HOME)/opt/cross/bin/i686-elf-
 CC := $(CROSS_COMPILE)gcc
 CXX := $(CROSS_COMPILE)g++
-AS := nasm
+AS := $(CROSS_COMPILE)as
 LD := $(CC)
 
 # Directory structure
@@ -12,7 +12,7 @@ BOOT_DIR := $(ISO_DIR)/boot
 GRUB_DIR := $(BOOT_DIR)/grub
 
 # Source files
-BOOT_SRC := src/arch/x86/boot.asm
+BOOT_SRC := src/arch/x86/boot.s
 LINKER_SCRIPT := src/boot/linker.ld
 GRUB_CFG := src/boot/grub.cfg
 
@@ -35,7 +35,7 @@ ISO_IMAGE := naos.iso
 # Compiler flags
 CFLAGS := -ffreestanding -O2 -Wall -Wextra -I src/include
 CXXFLAGS := $(CFLAGS) -fno-exceptions -fno-rtti
-ASFLAGS := -felf32
+ASFLAGS :=
 LDFLAGS := -T $(LINKER_SCRIPT) -ffreestanding -O2 -nostdlib -lgcc
 
 .PHONY: all build run clean lsp help _ensure_build_dir
@@ -107,7 +107,7 @@ $(ISO_DIR): | $(BUILD_DIR)
 
 # Dependency checks
 _check-toolchain:
-	@for tool in grub-file xorriso mformat $(CC) $(CXX) nasm; do \
+	@for tool in grub-file xorriso mformat $(CC) $(CXX) $(AS); do \
 		if ! command -v $$tool >/dev/null 2>&1; then \
 			case $$tool in \
 				$(CC)) echo "ERROR: i686-elf cross-compiler not found. See: https://wiki.osdev.org/GCC_Cross-Compiler";; \

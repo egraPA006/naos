@@ -1,0 +1,13 @@
+#include "klib/panic.hpp"
+#include "klib/printk.hpp"
+namespace klib {
+[[noreturn]] void panic(const char *message) {
+    asm volatile("cli");
+
+    kerror("KERNEL PANIC: %s", message);
+
+    while (1) {
+        asm volatile("hlt");
+    }
+}
+} // namespace klib

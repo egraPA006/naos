@@ -1,5 +1,4 @@
 #pragma once
-
 namespace klib {
 namespace __printk {
 enum log_level {
@@ -17,14 +16,14 @@ void printk(__printk::log_level level, const char *format, ...)
 
 void printk(const char *format, ...) __attribute__((format(printf, 1, 2)));
 
-#define perror(fmt, ...)                                                       \
-    printk(klib::__printk::ERROR, "%s: " fmt, __func__, ##__VA_ARGS__)
-#define pwarn(fmt, ...)                                                        \
-    printk(klib::__printk::WARN, "%s: " fmt, __func__, ##__VA_ARGS__)
-#define psuccess(fmt, ...)                                                     \
-    printk(klib::__printk::SUCCESS, "%s: " fmt, __func__, ##__VA_ARGS__)
-#define pinfo(fmt, ...)                                                        \
-    printk(klib::__printk::INFO, "%s: " fmt, __func__, ##__VA_ARGS__)
-#define pdebug(fmt, ...)                                                       \
-    printk(klib::__printk::DEBUG, "%s: " fmt, __func__, ##__VA_ARGS__)
+#define kerror(fmt, ...)                                                       \
+    klib::printk(klib::__printk::ERROR, "%s: " fmt, __func__, ##__VA_ARGS__)
+#define kwarn(fmt, ...)                                                        \
+    klib::printk(klib::__printk::WARN, "%s: " fmt, __func__, ##__VA_ARGS__)
+#define ksuccess(fmt, ...)                                                     \
+    klib::printk(klib::__printk::SUCCESS, "%s: " fmt, __func__, ##__VA_ARGS__)
+#define kinfo(fmt, ...)                                                        \
+    klib::printk(klib::__printk::INFO, "%s: " fmt, __func__, ##__VA_ARGS__)
+#define kdebug(fmt, ...)                                                       \
+    klib::printk(klib::__printk::DEBUG, "%s: " fmt, __func__, ##__VA_ARGS__)
 }; // namespace klib

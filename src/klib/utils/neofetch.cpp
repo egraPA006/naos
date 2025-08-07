@@ -1,5 +1,6 @@
-#include "klib/utils/neofetch.h"
-#include <arch/x86/serial.h>
+#include "klib/utils/neofetch.hpp"
+#include <arch/x86/serial.hpp>
+#include <cstddef>
 #include <stddef.h>
 
 namespace klib::utils {
@@ -54,6 +55,9 @@ void neofetch() {
         } else {
             write('\n');
         }
+    }
+    for (size_t i = 0; i < 4; i++) {
+        write('\n');
     }
 }
 

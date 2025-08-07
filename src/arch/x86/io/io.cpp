@@ -1,4 +1,4 @@
-#include "arch/x86/io.h"
+#include "arch/x86/io.hpp"
 
 namespace x86::io {
 void outb(uint16_t port, uint8_t value) {

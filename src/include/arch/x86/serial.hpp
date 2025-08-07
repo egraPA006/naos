@@ -18,7 +18,7 @@ enum color : uint8_t {
     Warning = Yellow,
     Success = Green,
     Info = Cyan,
-    Debug = Magenta
+    Debug = White
 };
 void write(char c);
 void write(const char *str);

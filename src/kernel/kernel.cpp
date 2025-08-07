@@ -1,9 +1,13 @@
-#include <klib/printk.h>
-#include <klib/utils/neofetch.h>
+#include <kernel/terminal/vga.hpp>
+#include <klib/printk.hpp>
+#include <klib/utils/neofetch.hpp>
 
 extern "C" void kernel_main(void) {
     klib::utils::neofetch();
-    klib::perror("Something happened!");
-    klib::psuccess("Everything fine!");
-    klib::printk("Test");
+    kernel::terminal::vga::Terminal terminal;
+    {
+        using kernel::terminal::vga::VGAColor;
+        terminal.set_color(VGAColor::Black, VGAColor::Blue);
+    }
+    terminal.write_string("test test test");
 }

@@ -1,84 +1,88 @@
-#include <stddef.h>
-#include <stdint.h>
-namespace kernel::terminal {
-enum vga_color {
-    VGA_COLOR_BLACK = 0,
-    VGA_COLOR_BLUE = 1,
-    VGA_COLOR_GREEN = 2,
-    VGA_COLOR_CYAN = 3,
-    VGA_COLOR_RED = 4,
-    VGA_COLOR_MAGENTA = 5,
-    VGA_COLOR_BROWN = 6,
-    VGA_COLOR_LIGHT_GREY = 7,
-    VGA_COLOR_DARK_GREY = 8,
-    VGA_COLOR_LIGHT_BLUE = 9,
-    VGA_COLOR_LIGHT_GREEN = 10,
-    VGA_COLOR_LIGHT_CYAN = 11,
-    VGA_COLOR_LIGHT_RED = 12,
-    VGA_COLOR_LIGHT_MAGENTA = 13,
-    VGA_COLOR_LIGHT_BROWN = 14,
-    VGA_COLOR_WHITE = 15,
-};
+#include "kernel/terminal/vga.hpp"
+#include <klib/printk.hpp>
 
-static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) {
-    return fg | bg << 4;
+namespace kernel::terminal::vga {
+
+Terminal::Terminal()
+    : row_(0), column_(0),
+      color_(make_color(VGAColor::LightGrey, VGAColor::Black)),
+      buffer_(reinterpret_cast<uint16_t *>(MEMORY_ADDRESS)) {
+    clear();
 }
 
-static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
-    return (uint16_t)uc | (uint16_t)color << 8;
+uint8_t Terminal::make_color(VGAColor fg, VGAColor bg) const {
+    return static_cast<uint8_t>(fg) | static_cast<uint8_t>(bg) << 4;
 }
 
-size_t strlen(const char *str) {
-    size_t len = 0;
-    while (str[len])
-        len++;
-    return len;
+uint16_t Terminal::make_entry(char c, uint8_t color) const {
+    return static_cast<uint16_t>(c) | static_cast<uint16_t>(color) << 8;
 }
 
-#define VGA_WIDTH 80
-#define VGA_HEIGHT 25
-#define VGA_MEMORY 0xB8000
+void Terminal::put_entry_at(char c, uint8_t color, size_t x, size_t y) {
+    const size_t index = y * WIDTH + x;
+    buffer_[index] = make_entry(c, color);
+}
 
-size_t terminal_row;
-size_t terminal_column;
-uint8_t terminal_color;
-uint16_t *terminal_buffer = (uint16_t *)VGA_MEMORY;
+void Terminal::put_char(char c) {
+    if (c == '\n') {
+        column_ = 0;
+        if (++row_ == HEIGHT) {
+            scroll();
+            row_ = HEIGHT - 1;
+        }
+        return;
+    }
 
-void terminal_initialize(void) {
-    terminal_row = 0;
-    terminal_column = 0;
-    terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-
-    for (size_t y = 0; y < VGA_HEIGHT; y++) {
-        for (size_t x = 0; x < VGA_WIDTH; x++) {
-            const size_t index = y * VGA_WIDTH + x;
-            terminal_buffer[index] = vga_entry(' ', terminal_color);
+    put_entry_at(c, color_, column_, row_);
+    if (++column_ == WIDTH) {
+        column_ = 0;
+        if (++row_ == HEIGHT) {
+            scroll();
+            row_ = HEIGHT - 1;
         }
     }
 }
 
-void terminal_setcolor(uint8_t color) { terminal_color = color; }
-
-void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) {
-    const size_t index = y * VGA_WIDTH + x;
-    terminal_buffer[index] = vga_entry(c, color);
-}
-
-void terminal_putchar(char c) {
-    terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
-    if (++terminal_column == VGA_WIDTH) {
-        terminal_column = 0;
-        if (++terminal_row == VGA_HEIGHT)
-            terminal_row = 0;
+void Terminal::write(const char *data, size_t size) {
+    for (size_t i = 0; i < size; i++) {
+        put_char(data[i]);
     }
 }
 
-void terminal_write(const char *data, size_t size) {
-    for (size_t i = 0; i < size; i++)
-        terminal_putchar(data[i]);
+void Terminal::write_string(const char *data) {
+    while (*data != '\0') {
+        put_char(*data++);
+    }
 }
 
-void terminal_writestring(const char *data) {
-    terminal_write(data, strlen(data));
+void Terminal::clear() {
+    for (size_t y = 0; y < HEIGHT; y++) {
+        for (size_t x = 0; x < WIDTH; x++) {
+            put_entry_at(' ', color_, x, y);
+        }
+    }
+    row_ = 0;
+    column_ = 0;
 }
-} // namespace kernel::terminal
+
+void Terminal::scroll() {
+    // Move all lines up by one
+    for (size_t y = 1; y < HEIGHT; y++) {
+        for (size_t x = 0; x < WIDTH; x++) {
+            const size_t current = y * WIDTH + x;
+            const size_t above = (y - 1) * WIDTH + x;
+            buffer_[above] = buffer_[current];
+        }
+    }
+
+    // Clear the bottom line
+    const size_t bottom_line = HEIGHT - 1;
+    for (size_t x = 0; x < WIDTH; x++) {
+        put_entry_at(' ', color_, x, bottom_line);
+    }
+}
+void Terminal::set_color(VGAColor fg, VGAColor bg) {
+    color_ = make_color(fg, bg);
+}
+
+} // namespace kernel::terminal::vga

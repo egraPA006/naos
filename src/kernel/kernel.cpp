@@ -1,5 +1,7 @@
 // #include "kernel/terminal/vga.hpp"
+#include "arch/x86/gdt.hpp"
 #include "klib/error.hpp"
+#include "klib/panic.hpp"
 #include "klib/printk.hpp"
 #include "klib/result.hpp"
 #include "klib/utils/neofetch.hpp"
@@ -15,13 +17,12 @@ Result<int> test(int a) {
 
 extern "C" void kernel_main(void) {
     klib::utils::neofetch();
-    kdebug("%s", test(4).unwrap_err().to_string());
-    switch (test(4).unwrap_err()) {
-    case Error::InvalidArgument:
-        kinfo("Lol kek");
-        break;
-    default:
-        kinfo("Wtf");
-    };
-    kwarn("%d", test(2).unwrap());
+    // setup gdt
+    x86::gdt::Gdt gdt;
+    gdt.add_entry(x86::gdt::Gdt::kernel_code_segment())
+        .expect("Failed to add kernel_code entry");
+    gdt.add_entry(x86::gdt::Gdt::kernel_data_segment())
+        .expect("Failed to add kernel_data entry");
+    gdt.load().expect("Failed to load GDT");
+    kinfo("Gdt loaded successfully");
 }

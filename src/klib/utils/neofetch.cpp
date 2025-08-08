@@ -56,7 +56,7 @@ void neofetch() {
             write('\n');
         }
     }
-    for (size_t i = 0; i < 4; i++) {
+    for (size_t i = 0; i < 1; i++) {
         write('\n');
     }
 }

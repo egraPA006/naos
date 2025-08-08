@@ -10,4 +10,13 @@ namespace klib {
         asm volatile("hlt");
     }
 }
+[[noreturn]] void panic() {
+    asm volatile("cli");
+
+    kerror("KERNEL PANIC");
+
+    while (1) {
+        asm volatile("hlt");
+    }
+}
 } // namespace klib

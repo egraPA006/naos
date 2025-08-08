@@ -13,6 +13,8 @@ class Error {
         FileNotFound,
         GdtFull,
         InvalidGdt,
+        InvalidDescriptor,
+        OutOfBounds,
         // Add new errors here...
         _Count
     };
@@ -27,8 +29,11 @@ class Error {
     // String conversion
     const char *to_string() const noexcept {
         static const char *names[] = {
-            "None",         "InvalidArgument", "OutOfMemory", "DeviceError",
-            "FileNotFound", "GdtFull",         "InvalidGdt"
+            "None",         "InvalidArgument",
+            "OutOfMemory",  "DeviceError",
+            "FileNotFound", "GdtFull",
+            "InvalidGdt",   "InvalidDescriptor",
+            "OutOfBounds"
             // Must match enum order
         };
         return type_ < _Count ? names[type_] : "Unknown";

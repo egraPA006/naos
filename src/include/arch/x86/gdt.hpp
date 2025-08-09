@@ -59,17 +59,17 @@ class Gdt {
     Gdt() noexcept;
 
     // Descriptor management
-    klib::Result<size_t> add_entry(const GdtEntry &entry);
-    klib::Result<size_t> add_segment(uint32_t base, uint32_t limit,
-                                     SegmentType type, PrivilegeLevel dpl,
-                                     bool read_write, bool conforming,
-                                     bool granular, bool size_32bit);
+    [[nodiscard]] klib::Result<size_t> add_entry(const GdtEntry &entry);
+    [[nodiscard]] klib::Result<size_t>
+    add_segment(uint32_t base, uint32_t limit, SegmentType type,
+                PrivilegeLevel dpl, bool read_write, bool conforming,
+                bool granular, bool size_32bit);
 
     // GDT operations
-    klib::Result<void> load() const;
+    [[nodiscard]] klib::Result<void> load() const;
 
     // Selector operations
-    klib::Result<uint16_t>
+    [[nodiscard]] klib::Result<uint16_t>
     create_selector(size_t index,
                     PrivilegeLevel rpl = PrivilegeLevel::Ring0) const;
 
@@ -138,7 +138,7 @@ class Gdt {
         uint16_t limit;
         const GdtEntry *base;
     };
-    klib::Result<void> validate_index(size_t index) const;
+    [[nodiscard]] klib::Result<void> validate_index(size_t index) const;
 };
 
 } // namespace x86::gdt

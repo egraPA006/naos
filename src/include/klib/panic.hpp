@@ -1,5 +1,5 @@
 #pragma once
 namespace klib {
 [[noreturn]] void panic(const char *message);
-[[noreturn]] void panic();
+[[noreturn, gnu::no_caller_saved_registers]] void panic();
 } // namespace klib

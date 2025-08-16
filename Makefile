@@ -42,9 +42,12 @@ ISO_IMAGE := naos.iso
 
 # Compiler flags
 CFLAGS := -ffreestanding -O2 -Wall -Wextra -I src/include
-CXXFLAGS := $(CFLAGS) -fno-exceptions -fno-rtti
+CXXFLAGS := $(CFLAGS) -fno-exceptions -fno-rtti -mgeneral-regs-only -mno-sse -mno-mmx -mno-80387 -msoft-float
 ASFLAGS :=
 LDFLAGS := -T $(LINKER_SCRIPT) -ffreestanding -O2 -nostdlib -nostartfiles -lgcc
+
+# Qemu flags
+QEMUFLAGS := -cdrom $(ISO_IMAGE) -serial stdio
 
 .PHONY: all build run clean lsp help _ensure_build_dir
 
@@ -65,7 +68,11 @@ build: $(ISO_IMAGE) | _check-toolchain _check-crt
 
 run: $(ISO_IMAGE) | _check-runtime
 	@echo "Running naos..."
-	@qemu-system-i386 -cdrom $(ISO_IMAGE) -serial stdio
+	@qemu-system-i386 $(QEMUFLAGS)
+
+run-debug: $(ISO_IMAGE) | _check-runtime
+	@echo "Running naos..."
+	@qemu-system-i386 $(QEMUFLAGS) -d int -no-reboot
 
 lsp: | _check-bear
 	bear -- make build

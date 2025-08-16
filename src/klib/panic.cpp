@@ -10,11 +10,9 @@ namespace klib {
         asm volatile("hlt");
     }
 }
-[[noreturn]] void panic() {
+[[noreturn, gnu::no_caller_saved_registers]] void panic() {
     asm volatile("cli");
-
-    kerror("KERNEL PANIC");
-
+    kerror("KERNEL PANIC!");
     while (1) {
         asm volatile("hlt");
     }

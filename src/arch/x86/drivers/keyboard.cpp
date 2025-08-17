@@ -7,7 +7,7 @@
 namespace x86::drivers::keyboard {
 namespace {
 char scancode_to_ascii(uint8_t scancode) {
-    static const char *layout =
+    static const char layout[] =
         "??1234567890-=??qwertyuiop[]\n?asdfghjkl;'`??\\zxcvbnm,./?*? ?";
     if (scancode >= sizeof(layout))
         return 0;

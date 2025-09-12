@@ -6,8 +6,7 @@ include config.mk
 include src/arch/$(ARCH)/config.mk
 
 include src/kernel/config.mk
-include src/libs/klib/config.mk
-ISO_IMAGE := naos.iso
+# include src/libs/klib/config.mk
 
 ALL_OBJS := $(CRTI_OBJ) $(CRTBEGIN_OBJ) \
             $(ARCH_OBJS) \
@@ -31,7 +30,6 @@ help:
 	@echo "  help      - Show this help message"
 
 build: $(ISO_IMAGE) | _check-toolchain _check-crt
-	@echo $(ISO_IMAGE)
 
 run: $(ISO_IMAGE)
 	@echo "Running NAOS..."
@@ -64,11 +62,11 @@ $(KERNEL_BIN): $(ALL_OBJS) $(LINKER_SCRIPT)
 
 # Pattern rules for building object files
 $(BUILD_DIR)/%.o: src/%.cpp | _ensure_build_dir
-	@echo "compiling file"
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(CRTI_OBJ): $(CRTI_SRC) | _ensure_build_dir
+	@echo $(CRTI_OBJ)
 	@mkdir -p $(@D)
 	$(AS) $(ASFLAGS) $< -o $@
 

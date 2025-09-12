@@ -1,4 +1,4 @@
-#include "arch/x86/gdt.hpp"
+#include "gdt.hpp"
 #include "klib/error.hpp"
 #include "klib/printk.hpp"
 

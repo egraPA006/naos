@@ -1,4 +1,4 @@
-#include "kernel/hal/CPU.hpp"
+#include <kernel/hal/CPU.hpp>
 
 namespace kernel::HAL {
     class x86_CPU : CPU {
